@@ -1,0 +1,120 @@
+DOMAINS
+nama,jender,pekerjaan,benda,alasan,zat = symbol %nama,jender,pekerjaan,benda,alasan,zat di nyatakan dalam jenis variabel dgn tipe nya simbol
+umur=integer %umur di nyatakan dalam jenis variabel dgn tipe integer
+
+PREDICATES
+	nondeterm orang(nama, umur, jender, pekerjaan) /*predikat orang dengan argumen nama,umur,jender,dan pekerjaan	
+							Keywoard nondeterm pada section PREDICATES yang mendahului predikat orang berfungsi untuk memberitahu ke 							        compiler Visual Prolog bahwa predikat tersebut mempunyai lebih dari satu kemungkinan jawaban*/
+	nondeterm selingkuh(nama, nama)  %predikat selingkuh dgn argumen nama dan nama
+	terbunuh_dengan(nama, benda)     %predikat terbunuh_dengan argumen nama dan benda
+	terbunuh(nama) 			 %terbunuh dgn argumen nama
+
+	nondeterm pembunuh(nama) %pembunuh dgn argumen nama
+	motif(alasan) 		 %motif dgn argumen alasan
+	ternodai(nama, zat)	 %ternodai dgn argumen nama dan zat
+	milik(nama, benda)	 %milik dgn argumen nam dan benda
+
+	nondeterm cara_kerja_mirip(benda, benda) %cara kerja mirip dgn argumen benda dan benda
+	nondeterm kemungkinan_milik(nama, benda) %kemungkinan milik dgn argumen nama dan benda
+	nondeterm dicurigai(nama)		 %di curigai dgn argumen nama
+
+/* * * Fakta-fakta tentang pembunuhan * * */
+
+CLAUSES
+	orang(budi,55,m,tukang_kayu).		 %nama budi dan umur 55 tahun dan memiliki jender men/laki" dan seorang tukang kayu
+	orang(aldi,25,m,pemain_sepak_bola).	 %nama aldi dan umur 25 tahun dan memiliki jender men/laki" dan seorang pemain sepakbola
+	orang(aldi,25,m,tukang_jagal). 		 %nama aldi dan umur 25 tahun dan memiliki jender men/laki" dan seorang tukang jagal
+	orang(joni,25,m,pencopet). 		 %nama joni dan umur 25 tahun dan memiliki jender men/laki" dan seorang pencopet
+
+selingkuh(ina,joni).	%ina selingkuhan joni
+selingkuh(ina,budi). 	%ina selingkuhan budi
+selingkuh(siti,joni). 	%siti selingkuhan joni
+
+	terbunuh_dengan(siti,pentungan). %siti terbunuh dengan pentungan
+	terbunuh(siti).			 %siti terbunuh
+
+motif(uang). 	%motifnya karena uang
+motif(cemburu). %motifnya karena cemburu
+motif(dendam).  %motifnya karena dendam
+
+	ternodai(budi, darah).	%budi ternodai dgn zat darah
+	ternodai(siti, darah). 	%siti ternodai dgn  zat darah
+	ternodai(aldi, lumpur). %aldi ternodai dgn  zat lumpur
+	ternodai(joni, coklat). %joni ternodai dgn  zat coklat
+	ternodai(ina, coklat).  %ina ternodai dgn  zat coklat
+
+milik(budi,kaki_palsu). %kaki palsu milik budi
+milik(joni,pistol).	%pistol milik joni
+
+/* * * Basis Pengetahuan * * */
+cara_kerja_mirip(kaki_palsu, pentungan). 	%cara kerjanya mirip menggunakan kaki palsu dan pentungan 
+cara_kerja_mirip(balok, pentungan). 		%cara kerjanya mirip menggunakan balok dan pentungan
+cara_kerja_mirip(gunting, pisau). 		%cara kerjanya mirip menggunakan gunting 
+cara_kerja_mirip(sepatu_bola, pentungan). 	%cara kerjanya mirip menggunakan sepatu bola dan pentungan
+
+kemungkinan_milik(X,sepatu_bola):- 	%kemungkinan milik X dan menggunakan sepatu bola jika
+orang(X,_,_,pemain_sepak_bola). 	%orang X dan variabel anonim dan variabel anonim adalah seorang pemain sepak bola
+kemungkinan_milik(X,gunting):- 		%kemungkinan milik X dan mempunyai benda gunting jika
+orang(X,_,_,pekerja_salon). 		%orang X dan variabel anonim dan variabel anonim dan sebagai pekerja salon
+kemungkinan_milik(X,Benda):- 		%kemungkinan milik X dan Benda? jika 
+milik(X,Benda). 			%milik X dan Benda ?
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* dicurigai semua orang yang memiliki senjata yang *
+* kerjanya mirip dengan senjata penyebab siti terbunuh. *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+dicurigai(X):- 			% di curigai X jika
+terbunuh_dengan(siti,Senjata) , %siti terbunuh dengan Senjata? dan
+cara_kerja_mirip(Benda,Senjata),%cara kerjanya mirip Benda? dan Senjata? dan 
+kemungkinan_milik(X,Benda). 	%kemungkinan milik X dan Benda?
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * *
+* dicurigai laki-laki yang selingkuh dengan siti. *
+* * * * * * * * * * * * * * * * * * * * * * * * * */
+
+dicurigai(X):- 		%dicurigai nama X jika
+motif(cemburu), 	%motif nya cemburu dan
+orang(X,_,m,_), 	%orang X dgn jender laki" dan
+selingkuh(siti,X). 	%siti selingkuh dgn X? 
+
+/* * * * * * * * * * * * * * * * * * * * * * *
+* dicurigai perempuan yang selingkuh dengan *
+* laki-laki yang juga selingkuh dengan siti *
+* * * * * * * * * * * * * * * * * * * * * * */
+
+dicurigai(X):- 		  %dicurigai nama X jika
+motif(cemburu), 	  %motifnya cemburu dan
+orang(X,_,f,_), 	  %orang X dengan jender f dan
+selingkuh(X,Lakilaki),    %Xselingkuh dgn Laki-laki? dan
+selingkuh(siti,Lakilaki). %siti selingkuh dgn Laki-laki?
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * *
+* dicurigai pencopet yang mempunyai motif uang. *
+* * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+dicurigai(X):- 		%di curigai nama X jika
+motif(uang), 		%motifnya uang dan
+orang(X,_,_,pencopet).  %orang Xseorang pencopet
+pembunuh(Pembunuh):- 	%Pembunuhnya? jika 
+orang(Pembunuh,_,_,_),  %orang Pembunuh? dan
+terbunuh(Terbunuh), 	%Terbunuh? dan
+Terbunuh <> Pembunuh, 	/* Bukan bunuh diri */
+dicurigai(Pembunuh), 	%dicurigai Pembunuh? dan
+ternodai(Pembunuh,Zat), %ternodai Pembunuh? dan Zat? dan
+ternodai(Terbunuh,Zat). %ternodai Terbunuh? dan Zat?
+
+GOAL
+pembunuh(X). %pembunuh X adalah budi 
+
+/*alasannya karena fakta utama siti terbunuh dgn senjata pentungan,lalu di curigailah semua orang yg memiliki senjata yg cara kerjanya
+ mirip dgn senjata penyebab siti terbunuh.dicurigai nama X jika siti terbunuh dgn senjata pentungan dan cara kerjanya mirip (mengecek 
+ fakta yg ada bahwa pentungan kemungkinan ada 3 nama dan dsini kita melakukan unifkasi/pencocokan) ada dua nama yg menjadi tersangka
+ pembunuhan yaitu budi dan aldi dgn pencocokan barang bukti yg ada, kemudian melacak kembali dgn aturan yg lain.Lalu di curigai pula
+ laki" yg selingkuh dgn siti yaitu joni tetapi di fakta yg ada joni tdk memiliki senjata yg cara kerjanya mirip dgn senjata penyebab siti
+ terbunuh dan walaupun aldi di curigai sbg pembunuh di fakta yg ada tidak ada di tuliskan bahwa aldi memiliki sepatu bola walaupun iya pemain 
+ sepakbola,dan mengapa budi lebih kuat ddicurigai sbg pembunuh karena budi di curigai memiliki senjata yg cara kernjanya mirip dgn senjata 
+ penyebab siti terbunuh,dan budi memiliki benda kaki palsu dan itu sdah sangat menjelaskan bahwa dia lah pembunuh siti dan tedapat pula di faktssa
+ bahwa kaki palsu di miliki oleh budi.*/
