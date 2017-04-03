@@ -65,7 +65,7 @@ milik(X,Benda). 			%milik X dan Benda ?
 * kerjanya mirip dengan senjata penyebab siti terbunuh. *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-dicurigai(X):- 			% di curigai X jika
+dicurigai(X):- 			% di curigai nama X jika
 terbunuh_dengan(siti,Senjata) , %siti terbunuh dengan Senjata? dan
 cara_kerja_mirip(Benda,Senjata),%cara kerjanya mirip Benda? dan Senjata? dan 
 kemungkinan_milik(X,Benda). 	%kemungkinan milik X dan Benda?
